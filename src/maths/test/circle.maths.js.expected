@@ -1,0 +1,6 @@
+const points = (n) => (() => {
+  const is = range(0, n)
+  const theta = (i) => i * TAU / n
+  const point = (theta) => [cos(theta), sin(theta)]
+  return map(() => point(theta(...arguments)), is)
+})

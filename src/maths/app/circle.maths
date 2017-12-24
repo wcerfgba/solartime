@@ -1,0 +1,5 @@
+points n =
+  let is          = range 0 n
+      theta i     = i * TAU / n
+      point theta = [cos theta, sin theta]
+  in  map (point . theta) is
