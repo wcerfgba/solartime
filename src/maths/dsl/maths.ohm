@@ -1,43 +1,47 @@
 Math {
+  ExpList
+    = Exp*
+
   Exp
     = Assign  -- decl
-    | Vect  -- bareexpr
+    | Vect    -- vect
+    | Add     -- add
+    | Mul     -- mul
+    | Pow     -- pow
+    | Paren   -- paren
+    | LVar    -- funcall
+    | ident   -- name
+    | number  -- num
 
   Assign
-    = LVar "=" Vect
+    = ident ArgList "=" Exp   -- func
+    | ident "=" Exp           -- const
 
   LVar
-    = ident ArgList  -- func
-    | ident
+    = ident ArgList   -- func
+    | ident           -- name
   
   ArgList
     = "(" ident ("," ident)*  ")"
 
   Vect
-    = "[" AddExp ("," AddExp)*  "]"  -- vect
-    | AddExp
+    = "[" Exp ("," Exp)*  "]"
 
-  AddExp
-    = AddExp "+" MulExp  -- plus
-    | AddExp "-" MulExp  -- minus
-    | MulExp
+  Add
+    = Exp "+" Exp  -- plus
+    | Exp "-" Exp  -- minus
 
-  MulExp
-    = MulExp "*" ExpExp  -- times
-    | MulExp "/" ExpExp  -- divide
-    | ExpExp
+  Mul
+    = Exp "*" Exp  -- times
+    | Exp "/" Exp  -- divide
 
-  ExpExp
-    = PriExp "^" ExpExp  -- power
-    | PriExp
+  Pow
+    = Exp "^" Exp
 
-  PriExp
-    = "(" Exp ")"  -- paren
-    | "+" PriExp   -- pos
-    | "-" PriExp   -- neg
-    | LVar -- funcall
-    | ident
-    | number
+  Paren
+    = "(" Exp ")" -- paren
+    | "+" Exp     -- pos
+    | "-" Exp     -- neg
 
   ident  (an identifier)
     = letter alnum*
