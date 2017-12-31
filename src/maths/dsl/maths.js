@@ -1,73 +1,21 @@
-import ohm from 'ohm-js';
-import fs from 'fs';
-
-const grammar = ohm.grammar(
-  fs.readFileSync(__dirname + '/maths.ohm')
-);
-
-const semantics = grammar.createSemantics()
-  .addAttribute('js', {
-    ExpList: function (es) {
-      return es.children.map(e => e.js).join(';\n') + ';';
-    },
-    Exp: function (e) {
-      return e.js;
-    },
-    Assign_func: function (name, args, _, right) {
-      return `const ${name.js} = (${args.js}) => ${right.js}`;
-    },
-    Assign_const: function (name, _, val) {
-      return `const ${name.js} = ${val.js}`;
-    },
-    LVar: function (e) {
-      return e.js;
-    },
-    LVar_func: function (name, args) {
-      return `${name.js}(${args.js})`;
-    },
-    LVar_name: function (name) {
-      return name.js;
-    },
-    ArgList: function (_lparen, head, _commas, tail, _rparen) {
-      return `${[head, ...tail.children].map(e => e.js).join(', ')}`;
-    },
-    Vect: function (_lparen, head, _commas, tail, _rparen) {
-      return `[${[head, ...tail.children].map(e => e.js).join(', ')}]`;
-    },
-    Add: function (e) {
-      return e.js;
-    },
-    Add_plus: function (left, op, right) {
-      return `${left.js} + ${right.js}`;
-    },
-    Add_minus: function (left, op, right) {
-      return `${left.js} - ${right.js}`;
-    },
-    Mul: function (e) {
-      return e.js;
-    },
-    Mul_times: function (left, op, right) {
-      return `${left.js} * ${right.js}`;
-    },
-    Mul_divide: function (left, op, right) {
-      return `${left.js} / ${right.js}`;
-    },
-    Pow: function (left, op, right) {
-      return `Math.pow(${left.js}, ${right.js})`;
-    },
-    Paren_paren: function (open, exp, close) {
-      return exp.js;
-    },
-    ident: function (firstChar, restChars) {
-      return this.sourceString;
-    },
-    number: function (chars) {
-      return this.sourceString;
-    },
-  });
-
-const app = fs.readFileSync(__dirname + '/../app/circle.maths');
-
-const match = grammar.match(app);
-const js = semantics(match).js;
-console.log(js);
+module.exports = {
+  ExpList: (es) => es.children.map(e => e.js).join(';\n') + ';',
+  Exp: (e) => e.js,
+  Assign_func: (name, args, _, right) => `const ${name.js} = (${args.js}) => ${right.js}`,
+  Assign_const: (name, _, val) => `const ${name.js} = ${val.js}`,
+  LVar: (e) => e.js,
+  LVar_func: (name, args) => `${name.js}(${args.js})`,
+  LVar_name: (name) => name.js,
+  ArgList: (_lparen, head, _commas, tail, _rparen) => `${[head, ...tail.children].map(e => e.js).join(', ')}`,
+  Vect: (_lparen, head, _commas, tail, _rparen) => `[${[head, ...tail.children].map(e => e.js).join(', ')}]`,
+  Add: (e) => e.js,
+  Add_plus: (left, op, right) => `${left.js} + ${right.js}`,
+  Add_minus: (left, op, right) => `${left.js} - ${right.js}`,
+  Mul: (e) => e.js,
+  Mul_times: (left, op, right) => `${left.js} * ${right.js}`,
+  Mul_divide: (left, op, right) => `${left.js} / ${right.js}`,
+  Pow: (left, op, right) => `Math.pow(${left.js}, ${right.js})`,
+  Paren_paren: (open, exp, close) => exp.js,
+  ident: function (firstChar, restChars) { return this.sourceString },
+  number: (chars) => chars
+};
