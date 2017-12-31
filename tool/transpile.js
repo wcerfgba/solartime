@@ -2,34 +2,41 @@ import ohm from 'ohm-js';
 import fs from 'fs';
 import path from 'path';
 
-const args = process.argv.slice(2);
+export default function transpile(targetLang, sourceFile) {
+  const sourceDir = path.dirname(sourceFile);
+  const sourceDsl = path.extname(sourceFile).slice(1);
 
-const targetLang = args[0];
-const sourceFile = args[1];
+  const grammarFile = path.normalize(`${sourceDir}/../dsl/${sourceDsl}.ohm`);
+  const semanticsFile = path.normalize(`${sourceDir}/../dsl/${sourceDsl}.${targetLang}`);
 
-const sourceDir = path.dirname(sourceFile);
-const sourceDsl = path.extname(sourceFile).slice(1);
+  const actionDict = require(path.relative(__dirname, semanticsFile));
 
-const grammarFile = path.normalize(`${sourceDir}/../dsl/${sourceDsl}.ohm`);
-const semanticsFile = path.normalize(`${sourceDir}/../dsl/${sourceDsl}.${targetLang}`);
+  const source = fs.readFileSync(sourceFile).toString();
+  const grammar = ohm.grammar(fs.readFileSync(grammarFile));
+  const semantics = grammar.createSemantics()
+    .addAttribute(
+      targetLang,
+      actionDict
+    );
 
-const actionDict = require(path.relative(__dirname, semanticsFile));
+  const match = grammar.match(source);
 
-const source = fs.readFileSync(sourceFile).toString();
-const grammar = ohm.grammar(fs.readFileSync(grammarFile));
-const semantics = grammar.createSemantics()
-  .addAttribute(
-    targetLang,
-    actionDict
-  );
+  if (match.failed()) {
+    return match.message;
+  }
 
-const match = grammar.match(source);
+  const transpiled = semantics(match)[targetLang];
 
-if (match.failed()) {
-  console.error(match.message);
-  process.exit(1);
+  return transpiled;
 }
 
-const transpiled = semantics(match).js;
+if (require.main === module) {
+  const args = process.argv.slice(2);
 
-console.log(transpiled);
+  const targetLang = args[0];
+  const sourceFile = args[1];
+
+  const result = transpile(targetLang, sourceFile);
+
+  console.log(result);
+}
