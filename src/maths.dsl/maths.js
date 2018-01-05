@@ -1,0 +1,21 @@
+module.exports = {
+  ExpList:      (es) => es.children.map(e => e.js).join(';\n') + ';',
+  Exp:          (e) => e.js,
+  Assign_func:  (name, args, _eq, right) => `const ${name.js} = (${args.js}) => ${right.js}`,
+  Assign_const: (name, _eq, val) => `const ${name.js} = ${val.js}`,
+  LVar:         (e) => e.js,
+  LVar_func:    (name, args) => `${name.js}(${args.js})`,
+  LVar_name:    (name) => name.js,
+  ArgList:      (_lparen, head, _commas, tail, _rparen) => `${[head, ...tail.children].map(e => e.js).join(', ')}`,
+  Vect:         (_lparen, head, _commas, tail, _rparen) => `[${[head, ...tail.children].map(e => e.js).join(', ')}]`,
+  Add:          (e) => e.js,
+  Add_plus:     (left, op, right) => `${left.js} + ${right.js}`,
+  Add_minus:    (left, op, right) => `${left.js} - ${right.js}`,
+  Mul:          (e) => e.js,
+  Mul_times:    (left, op, right) => `${left.js} * ${right.js}`,
+  Mul_divide:   (left, op, right) => `${left.js} / ${right.js}`,
+  Pow:          (left, op, right) => `Math.pow(${left.js}, ${right.js})`,
+  Paren_paren:  (open, exp, close) => exp.js,
+  ident:        function (firstChar, restChars) { return this.sourceString },
+  number:       (chars) => chars
+};

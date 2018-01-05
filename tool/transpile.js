@@ -6,8 +6,8 @@ export default function transpile(targetLang, sourceFile) {
   const sourceDir = path.dirname(sourceFile);
   const sourceDsl = path.extname(sourceFile).slice(1);
 
-  const grammarFile = path.normalize(`${sourceDir}/../dsl/${sourceDsl}.ohm`);
-  const semanticsFile = path.normalize(`${sourceDir}/../dsl/${sourceDsl}.${targetLang}`);
+  const grammarFile = path.normalize(`${sourceDir}/../${sourceDsl}.dsl/${sourceDsl}.ohm`);
+  const semanticsFile = path.normalize(`${sourceDir}/../${sourceDsl}.dsl/${sourceDsl}.${targetLang}`);
 
   const actionDict = require(path.relative(__dirname, semanticsFile));
 
